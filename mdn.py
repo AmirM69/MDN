@@ -146,17 +146,27 @@ class MDN(object):
 				raise Exception('Model exists, but no_load is set and no training data was given.')
 
 			elif X is not None and y is not None:
-				X = self.scalerx.fit_transform( self._ensure_format(X) )
-				y = self.scalery.fit_transform( self._ensure_format(y) )
+				self.scalerx.fit( self._ensure_format(X) )
+				self.scalery.fit( self._ensure_format(y) )
+
+				# Gather all data (train, validation, test, ...) into singular object
+				datasets = kwargs['datasets'] = kwargs.get('datasets', {})
+				datasets.update({'train': {'x' : X, 'y': y}})
+
+				for key, data in datasets.items(): 
+					datasets[key].update({
+						'x_t' : self.scalerx.transform( self._ensure_format(data['x']) ),
+						'y_t' : self.scalery.transform( self._ensure_format(data['y']) ),
+					})
 
 				self.output_slices = output_slices
-				self.n_in   = X.shape[1]
-				self.n_pred = y.shape[1] 
+				self.n_in   = datasets['train']['x_t'].shape[1]
+				self.n_pred = datasets['train']['y_t'].shape[1] 
 				self.n_out  = self.n_mix * (1 + self.n_pred + (self.n_pred*(self.n_pred+1))//2) # prior, mu, (lower triangle) sigma
 				# print(f'Training model with shapes X={X.shape} and ys={y.shape}')
 				
 				self.construct_model()
-				train_model(self, X, y, **kwargs)
+				train_model(self, **kwargs)
 				self.save_model()
 
 			else:
@@ -203,15 +213,15 @@ class MDN(object):
 	def construct_model(self):
 		with self.graph.as_default():
 			self.random = np.random.RandomState(self.seed)
-			tf.compat.v1.set_random_seed(self.random.randint(1e9, dtype=np.int64))
+			tf.compat.v1.set_random_seed(self.random.randint(1e10, dtype=np.int64))
 
 			self.global_step = tf.Variable(0, trainable=False, name='global_step')
 			self.is_training = tf.compat.v1.placeholder_with_default(False, [], name='is_training')
 
-			x = self.x = tf.compat.v1.placeholder(dtype=tf.float64, shape=[None, self.n_in],   name='x')
-			y = self.y = tf.compat.v1.placeholder(dtype=tf.float64, shape=[None, self.n_pred], name='y')	
-			T = self.T = tf.compat.v1.placeholder(dtype=tf.float64, shape=None, name='T') 
-			C = self.C = tf.compat.v1.placeholder(dtype=tf.float64, shape=None, name='C') 
+			x = self.x = tf.compat.v1.placeholder(dtype=tf.float32, shape=[None, self.n_in],   name='x')
+			y = self.y = tf.compat.v1.placeholder(dtype=tf.float32, shape=[None, self.n_pred], name='y')	
+			T = self.T = tf.compat.v1.placeholder(dtype=tf.float32, shape=None, name='T') 
+			C = self.C = tf.compat.v1.placeholder(dtype=tf.float32, shape=None, name='C') 
 			estimate   = self.forward(x)
 
 			with tf.control_dependencies( self._debug_nan([estimate, x], names=['estim', 'x']) ):
