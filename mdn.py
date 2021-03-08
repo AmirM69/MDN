@@ -212,7 +212,7 @@ class MDN(object):
 
 	def construct_model(self):
 		with self.graph.as_default():
-			self.random = np.random.RandomState(self.seed)
+			self.random = np.random.RandomState(self.seed, dtype=np.int64)
 			tf.compat.v1.set_random_seed(self.random.randint(1e10, dtype=np.int64))
 
 			self.global_step = tf.Variable(0, trainable=False, name='global_step')
