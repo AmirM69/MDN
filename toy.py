@@ -255,7 +255,7 @@ if __name__ == '__main__':
 			# prior, mu, sigma = coefs 
 
 			# top = prior == prior.max(1, keepdims=True)
-			# top[top.sum(1) > 1] = np.eye(top.shape[1])[np.random.randint(top.shape[1])].astype(np.bool)
+			# top[top.sum(1) > 1] = np.eye(top.shape[1])[np.random.randint(top.shape[1], dtype=np.int64)].astype(np.bool)
 
 			# losses.append(abs(loss))
 			# diffs.append((np.abs(mod_cov - true_cov)).mean(0).sum())
@@ -283,7 +283,7 @@ if __name__ == '__main__':
 				# 			feed_dict={model.x: x_test})
 				# 	if top is None:
 				# 		top = prior == prior.max(1, keepdims=True)
-				# 		top[top.sum(1) > 1] = np.eye(top.shape[1])[np.random.randint(top.shape[1])].astype(np.bool)
+				# 		top[top.sum(1) > 1] = np.eye(top.shape[1])[np.random.randint(top.shape[1], dtype=np.int64)].astype(np.bool)
 				# 	ests += [mu[top]]
 
 				# scale_len = 1
@@ -325,7 +325,7 @@ if __name__ == '__main__':
 				# ax.scatter(x_train.flatten(), y_train.flatten(), c=clusters/(clusters.max()+1), marker='x', alpha=0.5, zorder=1)
 
 				top = prior == prior.max(1, keepdims=True)
-				top[top.sum(1) > 1] = np.eye(top.shape[1])[np.random.randint(top.shape[1])].astype(np.bool)
+				top[top.sum(1) > 1] = np.eye(top.shape[1])[np.random.randint(top.shape[1], dtype=np.int64)].astype(np.bool)
 				ax.plot(x_test, mu[top], 'r.', zorder=15)
 
 				# def pdf(x, prior, mu, sigma):
