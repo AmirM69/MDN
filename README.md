@@ -12,6 +12,10 @@ The package can be cloned into a directory with:
 
 `git clone https://github.com/BrandonSmithJ/MDN`
 
+Alternatively, you may use pip to install:
+
+`pip install git+https://github.com/BrandonSmithJ/MDN`
+
 <br>
 
 The code may then either be used as a library, such as with the following:
@@ -27,7 +31,7 @@ chlor_a   = estimates[0]
 
 # Or, with just random data:
 import numpy as np 
-rand_data = [np.random.rand(3,3) for band in get_sensor_bands(sensor)]
+rand_data = np.dstack([np.random.rand(3,3) for band in get_sensor_bands(sensor)])
 estimates = image_estimates(rand_data, sensor=sensor)
 chlor_a   = estimates[0]
 ```
