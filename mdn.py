@@ -212,16 +212,16 @@ class MDN(object):
 
 	def construct_model(self):
 		with self.graph.as_default():
-			self.random = np.random.RandomState(self.seed, dtype=np.int64)
+			self.random = np.random.RandomState(self.seed)
 			tf.compat.v1.set_random_seed(self.random.randint(1e10, dtype=np.int64))
 
 			self.global_step = tf.Variable(0, trainable=False, name='global_step')
 			self.is_training = tf.compat.v1.placeholder_with_default(False, [], name='is_training')
 
-			x = self.x = tf.compat.v1.placeholder(dtype=tf.float64, shape=[None, self.n_in],   name='x')
-			y = self.y = tf.compat.v1.placeholder(dtype=tf.float64, shape=[None, self.n_pred], name='y')	
-			T = self.T = tf.compat.v1.placeholder(dtype=tf.float64, shape=None, name='T') 
-			C = self.C = tf.compat.v1.placeholder(dtype=tf.float64, shape=None, name='C') 
+			x = self.x = tf.compat.v1.placeholder(dtype=tf.float32, shape=[None, self.n_in],   name='x')
+			y = self.y = tf.compat.v1.placeholder(dtype=tf.float32, shape=[None, self.n_pred], name='y')	
+			T = self.T = tf.compat.v1.placeholder(dtype=tf.float32, shape=None, name='T') 
+			C = self.C = tf.compat.v1.placeholder(dtype=tf.float32, shape=None, name='C') 
 			estimate   = self.forward(x)
 
 			with tf.control_dependencies( self._debug_nan([estimate, x], names=['estim', 'x']) ):
